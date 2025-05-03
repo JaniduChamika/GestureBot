@@ -74,18 +74,18 @@ void loop() {
     Serial.print(a.acceleration.x);
     Serial.print("/t, Y: ");
     Serial.println(a.acceleration.y);
-    if (a.acceleration.y > 7) strcpy(gestureData.carmove, "R-250");
-    else if (a.acceleration.y < -7) strcpy(gestureData.carmove, "L-250");
-    else if (a.acceleration.x > 7) strcpy(gestureData.carmove, "R-250");
-    else if (a.acceleration.x < -7) strcpy(gestureData.carmove, "B-250");
-    else if (a.acceleration.y > 5) strcpy(gestureData.carmove, "R-200");
-    else if (a.acceleration.y < -5) strcpy(gestureData.carmove, "L-200");
-    else if (a.acceleration.x > 5) strcpy(gestureData.carmove, "B-200");
-    else if (a.acceleration.x < -5) strcpy(gestureData.carmove, "F-200");
-    else if (a.acceleration.y > 3) strcpy(gestureData.carmove, "R-150");
-    else if (a.acceleration.y < -3) strcpy(gestureData.carmove, "L-150");
-    else if (a.acceleration.x > 3) strcpy(gestureData.carmove, "B-150");
-    else if (a.acceleration.x < -3) strcpy(gestureData.carmove, "F-150");
+    if (a.acceleration.y > 7) strcpy(gestureData.carmove, "L-250");
+    else if (a.acceleration.y < -7) strcpy(gestureData.carmove, "R-250");
+    else if (a.acceleration.x > 7) strcpy(gestureData.carmove, "B-250");
+    else if (a.acceleration.x < -7) strcpy(gestureData.carmove, "F-250");
+    else if (a.acceleration.y > 6) strcpy(gestureData.carmove, "L-200");
+    else if (a.acceleration.y < -6) strcpy(gestureData.carmove, "R-200");
+    else if (a.acceleration.x > 6) strcpy(gestureData.carmove, "B-200");
+    else if (a.acceleration.x < -6) strcpy(gestureData.carmove, "F-200");
+    else if (a.acceleration.y > 4) strcpy(gestureData.carmove, "L-150");
+    else if (a.acceleration.y < -4) strcpy(gestureData.carmove, "R-150");
+    else if (a.acceleration.x > 4) strcpy(gestureData.carmove, "B-150");
+    else if (a.acceleration.x < -4) strcpy(gestureData.carmove, "F-150");
     else strcpy(gestureData.carmove, "STOP");
 
 
@@ -99,5 +99,5 @@ void loop() {
   Serial.println(gestureData.carmove);
   Serial.print("Action: ");
   Serial.println(gestureData.action);
-  delay(2000);
+ 
 }
