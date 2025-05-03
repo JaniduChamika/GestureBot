@@ -3,12 +3,16 @@
 #include <Wire.h>
 #include <Adafruit_MPU6050.h>
 #include <Adafruit_Sensor.h>
+//arm & car switching button
+const int buttonPin = 0;
+int lastButtonState = HIGH;
+int buttonCount = 0;
 
 Adafruit_MPU6050 mpu;
 typedef struct struct_message {
-  String  carmove;
-  String action;
-  String armmove;
+  char carmove[20];
+  char action[20];
+  char armmove[20];
 } struct_message;
 
 struct_message gestureData;
@@ -22,6 +26,9 @@ void onSent(uint8_t *mac, uint8_t sendStatus) {
 
 void setup() {
   Serial.begin(115200);
+  // switching button
+  pinMode(buttonPin, INPUT_PULLUP);
+
   WiFi.mode(WIFI_STA);
   WiFi.disconnect();
 
@@ -39,7 +46,7 @@ void setup() {
   mpu.setAccelerometerRange(MPU6050_RANGE_8_G);
   Serial.print("Accelerometer range set to: 8G");
   mpu.setFilterBandwidth(MPU6050_BAND_21_HZ);
-  Serial.print("Filter bandwidth set to: 44Hz");
+  Serial.print("Filter bandwidth set to: 21Hz");
 
   esp_now_set_self_role(ESP_NOW_ROLE_CONTROLLER);
   esp_now_add_peer(receiverMac, ESP_NOW_ROLE_SLAVE, 1, NULL, 0);
@@ -47,30 +54,50 @@ void setup() {
 }
 
 void loop() {
+  int currentState = digitalRead(buttonPin);
+  if (lastButtonState == HIGH && currentState == LOW) {
+    buttonCount++;
+    Serial.print("Button pressed: ");
+    Serial.println(buttonCount);
+    delay(200);  // debounce delay
+  }
 
-  sensors_event_t a, g, temp;
-  mpu.getEvent(&a, &g, &temp);
+  lastButtonState = currentState;
 
-  Serial.print("Acceleration X: ");
-  Serial.print(a.acceleration.x);
-  Serial.print("/t, Y: ");
-  Serial.print(a.acceleration.y);
-  if (a.acceleration.y > 7) gestureData.carmove = "R-250";
-  else if (a.acceleration.y < -7) gestureData.carmove = "L-250";
-  else if (a.acceleration.x > 7) gestureData.carmove = "B-250";
-  else if (a.acceleration.x < -7) gestureData.carmove = "F-250";
-  else if (a.acceleration.y > 5) gestureData.carmove = "R-200";
-  else if (a.acceleration.y < -5) gestureData.carmove = "L-200";
-  else if (a.acceleration.x > 5) gestureData.carmove = "B-200";
-  else if (a.acceleration.x < -5) gestureData.carmove = "F-200";
-  else if (a.acceleration.y > 3) gestureData.carmove = "R-150";
-  else if (a.acceleration.y < -3) gestureData.carmove = "L-150";
-  else if (a.acceleration.x > 3) gestureData.carmove = "B-150";
-  else if (a.acceleration.x < -3) gestureData.carmove = "F-150";
-  else gestureData.carmove = "STOP";
+  if (buttonCount % 2 == 0) {
+    strcpy(gestureData.action, "car");
+
+    sensors_event_t a, g, temp;
+    mpu.getEvent(&a, &g, &temp);
+
+    Serial.print("Acceleration X: ");
+    Serial.print(a.acceleration.x);
+    Serial.print("/t, Y: ");
+    Serial.println(a.acceleration.y);
+    if (a.acceleration.y > 7) strcpy(gestureData.carmove, "R-250");
+    else if (a.acceleration.y < -7) strcpy(gestureData.carmove, "L-250");
+    else if (a.acceleration.x > 7) strcpy(gestureData.carmove, "R-250");
+    else if (a.acceleration.x < -7) strcpy(gestureData.carmove, "B-250");
+    else if (a.acceleration.y > 5) strcpy(gestureData.carmove, "R-200");
+    else if (a.acceleration.y < -5) strcpy(gestureData.carmove, "L-200");
+    else if (a.acceleration.x > 5) strcpy(gestureData.carmove, "B-200");
+    else if (a.acceleration.x < -5) strcpy(gestureData.carmove, "F-200");
+    else if (a.acceleration.y > 3) strcpy(gestureData.carmove, "R-150");
+    else if (a.acceleration.y < -3) strcpy(gestureData.carmove, "L-150");
+    else if (a.acceleration.x > 3) strcpy(gestureData.carmove, "B-150");
+    else if (a.acceleration.x < -3) strcpy(gestureData.carmove, "F-150");
+    else strcpy(gestureData.carmove, "STOP");
+
+
+  } else {
+    strcpy(gestureData.action, "arm");
+    strcpy(gestureData.carmove, "No data");
+  }
 
   esp_now_send(receiverMac, (uint8_t *)&gestureData, sizeof(gestureData));
-  Serial.print("/t Gesture: " + gestureData.carmove);
-  Serial.println("");
+  Serial.print("Gesture: ");
+  Serial.println(gestureData.carmove);
+  Serial.print("Action: ");
+  Serial.println(gestureData.action);
   delay(2000);
 }
