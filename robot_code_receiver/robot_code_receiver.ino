@@ -2,9 +2,9 @@
 #include <esp_now.h>
 
 typedef struct struct_message {
-  String  carmove;
-  String action;
-  String armmove;
+  char carmove[20];
+  char action[20];
+  char armmove[20];
 } struct_message;
 
 struct_message gestureData;
@@ -12,8 +12,11 @@ struct_message gestureData;
 void onReceive(const uint8_t *mac, const uint8_t *data, int len) {
   memcpy(&gestureData, data, sizeof(gestureData));
 
-  String gesture =gestureData.carmove;
-  Serial.print("Received Gesture: ");
+  String gesture = String(gestureData.carmove);
+  String action =String(gestureData.action);
+  Serial.print("Action : ");
+  Serial.print(action);
+  Serial.print("\t Received Gesture: ");
   Serial.println(gesture);
 
   // Here you can add actions like:
