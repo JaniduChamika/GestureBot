@@ -28,14 +28,14 @@ void onReceive(const uint8_t *mac, const uint8_t *data, int len) {
   Serial.print("\t Received Gesture: ");
   Serial.println(gesture);
   if (action == "car") {
-    if (gesture == "R-250") {
-      turnRight(250);
-    } else if (gesture == "L-250") {
-      turnLeft(250);
-    } else if (gesture == "B-250") {
-      moveBackward(250);
-    } else if (gesture == "F-250") {
-      moveForward(250);
+    if (gesture == "R-225") {
+      turnRight(225);
+    } else if (gesture == "L-225") {
+      turnLeft(225);
+    } else if (gesture == "B-225") {
+      moveBackward(225);
+    } else if (gesture == "F-225") {
+      moveForward(225);
     } else if (gesture == "R-200") {
       turnRight(200);
     } else if (gesture == "L-200") {
@@ -44,14 +44,22 @@ void onReceive(const uint8_t *mac, const uint8_t *data, int len) {
       moveBackward(200);
     } else if (gesture == "F-200") {
       moveForward(200);
-    } else if (gesture == "R-150") {
-      turnRight(150);
-    } else if (gesture == "L-150") {
-      turnLeft(150);
-    } else if (gesture == "B-150") {
-      moveBackward(150);
-    } else if (gesture == "F-150") {
-      moveForward(150);
+    } else if (gesture == "R-175") {
+      turnRight(175);
+    } else if (gesture == "L-175") {
+      turnLeft(175);
+    } else if (gesture == "B-175") {
+      moveBackward(175);
+    } else if (gesture == "F-175") {
+      moveForward(175);
+    } else if (gesture == "R-50") {
+      turnRight(50);
+    } else if (gesture == "L-50") {
+      turnLeft(50);
+    } else if (gesture == "B-50") {
+      moveBackward(50);
+    } else if (gesture == "F-50") {
+      moveForward(50);
     } else if (gesture == "STOP") {
       stopMotors();
     }
