@@ -6,7 +6,12 @@
 //arm & car switching button
 const int buttonPin = 0;
 int lastButtonState = HIGH;
-int buttonCount = 0;
+int buttonCount = 1 - ;
+
+//for arm
+const int armBtnPin = 2;
+int lastarmBtnState = HIGH;
+int armBtnCount = 0;
 
 Adafruit_MPU6050 mpu;
 typedef struct struct_message {
@@ -28,6 +33,8 @@ void setup() {
   Serial.begin(115200);
   // switching button
   pinMode(buttonPin, INPUT_PULLUP);
+
+  pinMode(armBtnPin, INPUT_PULLUP);
 
   WiFi.mode(WIFI_STA);
   WiFi.disconnect();
@@ -63,8 +70,9 @@ void loop() {
   }
 
   lastButtonState = currentState;
-
-  if (buttonCount % 2 == 0) {
+  if (buttonCount == 0) {
+    Serial.print("Robot Booting....");
+  } else if (buttonCount % 2 == 0) {
     strcpy(gestureData.action, "car");
 
     sensors_event_t a, g, temp;
@@ -74,34 +82,67 @@ void loop() {
     Serial.print(a.acceleration.x);
     Serial.print("/t, Y: ");
     Serial.println(a.acceleration.y);
-    if (a.acceleration.y > 9) strcpy(gestureData.carmove, "L-225");
-    else if (a.acceleration.y < -9) strcpy(gestureData.carmove, "R-225");
+    if (a.acceleration.y > 9) strcpy(gestureData.carmove, "L-100");
+    else if (a.acceleration.y < -9) strcpy(gestureData.carmove, "R-100");
     else if (a.acceleration.x > 9) strcpy(gestureData.carmove, "B-225");
     else if (a.acceleration.x < -9) strcpy(gestureData.carmove, "F-225");
-    else if (a.acceleration.y > 8) strcpy(gestureData.carmove, "L-200");
-    else if (a.acceleration.y < -8) strcpy(gestureData.carmove, "R-200");
-    else if (a.acceleration.x > 8) strcpy(gestureData.carmove, "B-200");
-    else if (a.acceleration.x < -8) strcpy(gestureData.carmove, "F-200");
-    else if (a.acceleration.y > 7) strcpy(gestureData.carmove, "L-175");
-    else if (a.acceleration.y < -7) strcpy(gestureData.carmove, "R-175");
-    else if (a.acceleration.x > 7) strcpy(gestureData.carmove, "B-175");
-    else if (a.acceleration.x < -7) strcpy(gestureData.carmove, "F-175");
-    else if (a.acceleration.y > 5) strcpy(gestureData.carmove, "L-50");
-    else if (a.acceleration.y < -5) strcpy(gestureData.carmove, "R-50");
-    else if (a.acceleration.x > 5) strcpy(gestureData.carmove, "B-50");
-    else if (a.acceleration.x < -5) strcpy(gestureData.carmove, "F-50");
+    else if (a.acceleration.y > 8) strcpy(gestureData.carmove, "L-100");
+    else if (a.acceleration.y < -8) strcpy(gestureData.carmove, "R-100");
+    else if (a.acceleration.x > 8) strcpy(gestureData.carmove, "B-150");
+    else if (a.acceleration.x < -8) strcpy(gestureData.carmove, "F-150");
+    else if (a.acceleration.y > 7) strcpy(gestureData.carmove, "L-100");
+    else if (a.acceleration.y < -7) strcpy(gestureData.carmove, "R-100");
+    else if (a.acceleration.x > 7) strcpy(gestureData.carmove, "B-100");
+    else if (a.acceleration.x < -7) strcpy(gestureData.carmove, "F-100");
+    else if (a.acceleration.y > 5) strcpy(gestureData.carmove, "L-70");
+    else if (a.acceleration.y < -5) strcpy(gestureData.carmove, "R-70");
+    else if (a.acceleration.x > 5) strcpy(gestureData.carmove, "B-70");
+    else if (a.acceleration.x < -5) strcpy(gestureData.carmove, "F-70");
     else strcpy(gestureData.carmove, "STOP");
 
-
+    Serial.print("Gesture: ");
+    Serial.println(gestureData.carmove);
   } else {
+
+    int armcurrentState = digitalRead(armBtnPin);
+    if (lastarmBtnState == HIGH && armcurrentState == LOW) {
+      armBtnCount++;
+      Serial.print("Arm Button pressed: ");
+      Serial.println(armBtnCount);
+      delay(200);  // debounce delay
+    }
+
+    lastarmBtnState = armcurrentState;
     strcpy(gestureData.action, "arm");
-    strcpy(gestureData.carmove, "No data");
+
+    sensors_event_t a, g, temp;
+    mpu.getEvent(&a, &g, &temp);
+
+    Serial.print("Acceleration X: ");
+    Serial.print(a.acceleration.x);
+    Serial.print("/t, Y: ");
+    Serial.println(a.acceleration.y);
+    if (armBtnCount % 2 == 0) {
+
+      if (a.acceleration.y > 5) strcpy(gestureData.armmove, "LEFT");
+      else if (a.acceleration.y < -5) strcpy(gestureData.armmove, "RIGHT");
+      else if (a.acceleration.x > 5) strcpy(gestureData.armmove, "BACKWARD-S");
+      else if (a.acceleration.x < -5) strcpy(gestureData.armmove, "FORWARD-S");
+      else strcpy(gestureData.armmove, "STOP");
+    } else {
+      if (a.acceleration.y > 5) strcpy(gestureData.armmove, "OPEN");
+      else if (a.acceleration.y < -5) strcpy(gestureData.armmove, "CLOSE");
+      else if (a.acceleration.x > 5) strcpy(gestureData.armmove, "BACKWARD-E");
+      else if (a.acceleration.x < -5) strcpy(gestureData.armmove, "FORWARD-E");
+      else strcpy(gestureData.armmove, "STOP");
+    }
+
+    Serial.print("Gesture: ");
+    Serial.println(gestureData.armmove);
   }
 
   esp_now_send(receiverMac, (uint8_t *)&gestureData, sizeof(gestureData));
-  Serial.print("Gesture: ");
-  Serial.println(gestureData.carmove);
+
   Serial.print("Action: ");
   Serial.println(gestureData.action);
- 
 }
