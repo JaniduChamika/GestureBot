@@ -6,7 +6,7 @@
 //arm & car switching button
 const int buttonPin = 0;
 int lastButtonState = HIGH;
-int buttonCount = 1 - ;
+int buttonCount = -1  ;
 
 //for arm
 const int armBtnPin = 2;
@@ -41,8 +41,7 @@ void setup() {
 
   if (!mpu.begin()) {
     Serial.println("MPU6050 not connected!");
-    while (1)
-      ;
+    while (1);
   }
   Serial.println("MPU6050 ready!");
 
@@ -70,7 +69,7 @@ void loop() {
   }
 
   lastButtonState = currentState;
-  if (buttonCount == 0) {
+  if (buttonCount == -1) {
     Serial.print("Robot Booting....");
   } else if (buttonCount % 2 == 0) {
     strcpy(gestureData.action, "car");
@@ -82,22 +81,22 @@ void loop() {
     Serial.print(a.acceleration.x);
     Serial.print("/t, Y: ");
     Serial.println(a.acceleration.y);
-    if (a.acceleration.y > 9) strcpy(gestureData.carmove, "L-100");
-    else if (a.acceleration.y < -9) strcpy(gestureData.carmove, "R-100");
+    if (a.acceleration.y > 9) strcpy(gestureData.carmove, "L-125");
+    else if (a.acceleration.y < -9) strcpy(gestureData.carmove, "R-125");
     else if (a.acceleration.x > 9) strcpy(gestureData.carmove, "B-225");
     else if (a.acceleration.x < -9) strcpy(gestureData.carmove, "F-225");
-    else if (a.acceleration.y > 8) strcpy(gestureData.carmove, "L-100");
-    else if (a.acceleration.y < -8) strcpy(gestureData.carmove, "R-100");
+    else if (a.acceleration.y > 8) strcpy(gestureData.carmove, "L-125");
+    else if (a.acceleration.y < -8) strcpy(gestureData.carmove, "R-125");
     else if (a.acceleration.x > 8) strcpy(gestureData.carmove, "B-150");
     else if (a.acceleration.x < -8) strcpy(gestureData.carmove, "F-150");
     else if (a.acceleration.y > 7) strcpy(gestureData.carmove, "L-100");
     else if (a.acceleration.y < -7) strcpy(gestureData.carmove, "R-100");
     else if (a.acceleration.x > 7) strcpy(gestureData.carmove, "B-100");
     else if (a.acceleration.x < -7) strcpy(gestureData.carmove, "F-100");
-    else if (a.acceleration.y > 5) strcpy(gestureData.carmove, "L-70");
-    else if (a.acceleration.y < -5) strcpy(gestureData.carmove, "R-70");
-    else if (a.acceleration.x > 5) strcpy(gestureData.carmove, "B-70");
-    else if (a.acceleration.x < -5) strcpy(gestureData.carmove, "F-70");
+    else if (a.acceleration.y > 5) strcpy(gestureData.carmove, "L-100");
+    else if (a.acceleration.y < -5) strcpy(gestureData.carmove, "R-100");
+    else if (a.acceleration.x > 5) strcpy(gestureData.carmove, "B-80");
+    else if (a.acceleration.x < -5) strcpy(gestureData.carmove, "F-80");
     else strcpy(gestureData.carmove, "STOP");
 
     Serial.print("Gesture: ");
