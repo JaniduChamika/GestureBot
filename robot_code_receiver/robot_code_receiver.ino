@@ -72,45 +72,45 @@ void onReceive(const uint8_t *mac, const uint8_t *data, int len) {
     Serial.print("\t Received Gesture: ");
     Serial.println(gesture);
     if (gesture == "R-225") {
-      turnRight(225);
-    } else if (gesture == "L-225") {
-      turnLeft(225);
-    } else if (gesture == "B-225") {
-      moveBackward(225);
-    } else if (gesture == "F-225") {
-      moveForward(225);
-    } else if (gesture == "R-150") {
-      turnRight(150);
-    } else if (gesture == "L-150") {
-      turnLeft(150);
-    } else if (gesture == "B-150") {
-      moveBackward(150);
-    } else if (gesture == "F-150") {
-      moveForward(150);
-    } else if (gesture == "R-125") {
-      turnRight(125);
-    } else if (gesture == "L-125") {
-      turnLeft(125);
-    } else if (gesture == "B-125") {
-      moveBackward(125);
-    } else if (gesture == "F-125") {
-      moveForward(125);
-    } else if (gesture == "R-100") {
       turnRight(100);
-    } else if (gesture == "L-100") {
+    } else if (gesture == "L-225") {
       turnLeft(100);
-    } else if (gesture == "B-100") {
+    } else if (gesture == "B-225") {
       moveBackward(100);
-    } else if (gesture == "F-100") {
+    } else if (gesture == "F-225") {
       moveForward(100);
-    } else if (gesture == "R-80") {
+    } else if (gesture == "R-150") {
+      turnRight(100);
+    } else if (gesture == "L-150") {
+      turnLeft(100);
+    } else if (gesture == "B-150") {
+      moveBackward(100);
+    } else if (gesture == "F-150") {
+      moveForward(100);
+    } else if (gesture == "R-125") {
+      turnRight(100);
+    } else if (gesture == "L-125") {
+      turnLeft(100);
+    } else if (gesture == "B-125") {
+      moveBackward(100);
+    } else if (gesture == "F-125") {
+      moveForward(100);
+    } else if (gesture == "R-100") {
       turnRight(80);
-    } else if (gesture == "L-80") {
+    } else if (gesture == "L-100") {
       turnLeft(80);
-    } else if (gesture == "B-80") {
+    } else if (gesture == "B-100") {
       moveBackward(80);
-    } else if (gesture == "F-80") {
+    } else if (gesture == "F-100") {
       moveForward(80);
+    } else if (gesture == "R-80") {
+      turnRight(50);
+    } else if (gesture == "L-80") {
+      turnLeft(50);
+    } else if (gesture == "B-80") {
+      moveBackward(50);
+    } else if (gesture == "F-80") {
+      moveForward(50);
     } else if (gesture == "STOP") {
       stopMotors();
     }
@@ -248,7 +248,7 @@ float getDistance() {
 
 void moveForward(int speed) {
   ultrasonicSev.write(90);
-  if (getDistance() > 10) {
+  if (getDistance() > 30) {
     digitalWrite(IN1, LOW);
     digitalWrite(IN2, HIGH);
     digitalWrite(IN3, LOW);
@@ -271,7 +271,7 @@ void moveBackward(int speed) {
 
 void turnRight(int speed) {
   ultraSonicRight();
-  if (getDistance() > 10) {
+  if (getDistance() > 30) {
     digitalWrite(IN1, LOW);
     digitalWrite(IN2, HIGH);
     digitalWrite(IN3, HIGH);
@@ -285,7 +285,7 @@ void turnRight(int speed) {
 
 void turnLeft(int speed) {
   ultraSonicLeft();
-  if (getDistance() > 10) {
+  if (getDistance() > 30) {
     digitalWrite(IN1, HIGH);
     digitalWrite(IN2, LOW);
     digitalWrite(IN3, LOW);
