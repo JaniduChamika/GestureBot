@@ -10,7 +10,6 @@ typedef struct struct_message {
 
 struct_message gestureData;
 
-
 //LEFT
 int IN1 = 16;
 int IN2 = 17;
@@ -59,7 +58,7 @@ bool isConnected = false;
 void onReceive(const uint8_t *mac, const uint8_t *data, int len) {
   memcpy(&gestureData, data, sizeof(gestureData));
 
- lastReceivedTime = millis();
+  lastReceivedTime = millis();
   isConnected = true;
 
   String gesture = String(gestureData.carmove);
@@ -201,10 +200,10 @@ void setup() {
 }
 
 void loop() {
-   if (millis() - lastReceivedTime > TIMEOUT && isConnected) {
+  if (millis() - lastReceivedTime > TIMEOUT && isConnected) {
     stopMotors();
     isConnected = false;
-     Serial.println("ESP-NOW disconnect");
+    Serial.println("ESP-NOW disconnect");
   }
 
   delay(100);  // small delay for efficiency
@@ -298,7 +297,7 @@ void turnLeft(int speed) {
 }
 
 void stopMotors() {
-  
+
   digitalWrite(IN1, LOW);
   digitalWrite(IN2, LOW);
   digitalWrite(IN3, LOW);
