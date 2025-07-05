@@ -52,13 +52,13 @@ const int carLight = 14;
 
 float globalDistance = 0.0;
 
-unsigned long lastReceivedTime = 0;
+unsigned long lastRx = millis();
 bool isConnected = false;
-#define TIMEOUT 500  // 2 seconds
-void onReceive(const uint8_t *mac, const uint8_t *data, int len) {
+#define TIMEOUT 1000  // 2 seconds
+void IRAM_ATTR onReceive(const uint8_t *mac, const uint8_t *data, int len) {
   memcpy(&gestureData, data, sizeof(gestureData));
 
-  lastReceivedTime = millis();
+  lastRx = millis();
   isConnected = true;
 
   String gesture = String(gestureData.carmove);
@@ -194,13 +194,13 @@ void setup() {
     NULL,
     1,
     NULL);
-
+  xTaskCreatePinnedToCore(ultrasonicTask, "US", 1024, NULL, 1, NULL, 1);
   esp_now_register_recv_cb(onReceive);
   Serial.println("ESP-NOW Receiver Ready");
 }
 
 void loop() {
-  if (millis() - lastReceivedTime > TIMEOUT && isConnected) {
+  if (millis() - lastRx > TIMEOUT && isConnected) {
     stopMotors();
     isConnected = false;
     Serial.println("ESP-NOW disconnect");
@@ -231,23 +231,38 @@ float getDistance() {
   digitalWrite(trigPin, HIGH);
   delayMicroseconds(10);
   digitalWrite(trigPin, LOW);
-  long duration = pulseIn(echoPin, HIGH);  // 30ms timeout (~5 meters)
+  long duration = pulseIn(echoPin, HIGH, 30000);  // 30ms timeout (~5 meters)
   float distance = duration * 0.034 / 2;
 
 
   // globalDistance = distance;
 
-  Serial.print("Distance: ");
-  Serial.print(globalDistance);
-  Serial.println(" cm");
+  // Serial.print("Distance: ");
+  // Serial.print(globalDistance);
+  // Serial.println(" cm");
 
   return distance;
 }
+void ultrasonicTask(void *pv)  // 512 bytes stack is enough
+{
+  for (;;) {
+    // Trigger pulse
+    digitalWrite(trigPin, LOW);
+    delayMicroseconds(2);
+    digitalWrite(trigPin, HIGH);
+    delayMicroseconds(10);
+    digitalWrite(trigPin, LOW);
 
+    long dur = pulseIn(echoPin, HIGH, 30000);        // timeout 30 ms
+    if (dur > 0) globalDistance = dur * 0.0343 / 2;  // cm
+
+    vTaskDelay(50 / portTICK_PERIOD_MS);  // 20 Hz update
+  }
+}
 
 void moveForward(int speed) {
   ultrasonicSev.write(90);
-  if (getDistance() > 30) {
+  if (globalDistance> 30) {
     digitalWrite(IN1, LOW);
     digitalWrite(IN2, HIGH);
     digitalWrite(IN3, LOW);
@@ -270,7 +285,7 @@ void moveBackward(int speed) {
 
 void turnRight(int speed) {
   ultraSonicRight();
-  if (getDistance() > 30) {
+  if (globalDistance > 30) {
     digitalWrite(IN1, LOW);
     digitalWrite(IN2, HIGH);
     digitalWrite(IN3, HIGH);
@@ -284,7 +299,7 @@ void turnRight(int speed) {
 
 void turnLeft(int speed) {
   ultraSonicLeft();
-  if (getDistance() > 30) {
+  if (globalDistance> 30) {
     digitalWrite(IN1, HIGH);
     digitalWrite(IN2, LOW);
     digitalWrite(IN3, LOW);
